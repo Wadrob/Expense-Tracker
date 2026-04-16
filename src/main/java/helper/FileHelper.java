@@ -20,7 +20,7 @@ public class FileHelper {
 
         if (file.createNewFile()) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                writer.write("id,description,amount\n");
+                writer.write("id,date,description,amount\n");
             }
         }
 
@@ -32,9 +32,13 @@ public class FileHelper {
             return List.of();
         }
 
-        CsvSchema schema = CSV_MAPPER
-                .schemaFor(Expense.class)
-                .withHeader();
+        CsvSchema schema = CsvSchema.builder()
+                .addColumn("id")
+                .addColumn("date")
+                .addColumn("description")
+                .addColumn("amount")
+                .setUseHeader(true)
+                .build();
 
         try {
             MappingIterator<Expense> iterator =

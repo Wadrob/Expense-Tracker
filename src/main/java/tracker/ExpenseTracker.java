@@ -3,6 +3,7 @@ package tracker;
 import domain.Expense;
 import service.ExpenseTracerService;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class ExpenseTracker {
@@ -18,11 +19,16 @@ public class ExpenseTracker {
     public void run() {
 
         while (true) {
-            System.out.println("Use command add/quit");
+            System.out.println("Use command or type info for commands");
             String command = scanner.nextLine().trim();
 
             switch (command) {
                 case "add" -> handleAdd();
+                case "list" -> handleList();
+                case "summary" -> handleSummary();
+                case "info" -> handleInfo();
+                case "delete" -> handleDelete();
+                case "summary month" -> handleSummaryMonth();
                 case "quit" -> {
                     System.out.println("Program shutdown");
                     return;
@@ -30,6 +36,76 @@ public class ExpenseTracker {
 
                 default -> System.out.println("Unknown command, please try again.");
             }
+        }
+    }
+
+    private void handleSummaryMonth() {
+        System.out.println("Summary month: ");
+
+        String idInput = scanner.nextLine();
+        int month;
+
+        try {
+            month = Integer.parseInt(idInput);
+            if (month <= 0) {
+                throw new IllegalArgumentException("Month must be positive");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Month must be a number");
+        }
+
+        try {
+            service.handleMonth(month);
+        } catch (Exception e) {
+            System.out.println("Error when adding expenses for month: " + e.getMessage());
+        }
+    }
+
+    private void handleDelete() {
+        System.out.println("ID to remove: ");
+
+        String idInput = scanner.nextLine();
+        int id;
+
+        try {
+            id = Integer.parseInt(idInput);
+            if (id <= 0) {
+                throw new IllegalArgumentException("Id must be positive");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Id must be a number");
+        }
+
+        try {
+            service.deleteExpense(id);
+        } catch (Exception e) {
+            System.out.println("Error when removing id: " + e.getMessage());
+        }
+    }
+
+    private void handleInfo() {
+        System.out.println("""
+                Type add to add new record
+                Type list to list all records in file
+                Type summary to list summary of amount in file
+                Type delete to delete record
+                Type summary month to list expenses for month
+                Type quit to quit program""");
+    }
+
+    private void handleSummary() {
+        try {
+            service.summaryAmount();
+        } catch (IOException e) {
+            System.out.println("Problem with amount adding: " + e.getMessage());
+        }
+    }
+
+    private void handleList() {
+        try {
+            service.readFile();
+        } catch (Exception e) {
+            System.out.println("Error when reading file: " + e.getMessage());
         }
     }
 
