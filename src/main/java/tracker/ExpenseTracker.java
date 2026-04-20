@@ -1,17 +1,18 @@
 package tracker;
 
 import domain.Expense;
-import service.ExpenseTracerService;
+import service.ExpenseService;
 
 import java.io.IOException;
 import java.util.Scanner;
 
 public class ExpenseTracker {
+    private final static String EXPENSE_FILE_CSV = "expenseFile.csv";
 
-    private final ExpenseTracerService service;
+    private final ExpenseService service;
     private final Scanner scanner;
 
-    public ExpenseTracker(ExpenseTracerService service) {
+    public ExpenseTracker(ExpenseService service) {
         this.service = service;
         this.scanner = new Scanner(System.in);
     }
@@ -19,7 +20,7 @@ public class ExpenseTracker {
     public void run() {
 
         while (true) {
-            System.out.println("Use command or type info for commands");
+            System.out.println("Enter a command or type info for commands info");
             String command = scanner.nextLine().trim();
 
             switch (command) {
@@ -77,7 +78,7 @@ public class ExpenseTracker {
         }
 
         try {
-            service.deleteExpense(id);
+            service.deleteExpense(id, EXPENSE_FILE_CSV);
         } catch (Exception e) {
             System.out.println("Error when removing id: " + e.getMessage());
         }

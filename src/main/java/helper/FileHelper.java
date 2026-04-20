@@ -12,11 +12,10 @@ import java.io.IOException;
 import java.util.List;
 
 public class FileHelper {
-    private final static String EXPENSE_FILE_CSV = "expenseFile.csv";
     private static final CsvMapper CSV_MAPPER = new CsvMapper();
 
-    public static File getFile() throws IOException {
-        File file = new File(EXPENSE_FILE_CSV);
+    public static File getFile(String path) throws IOException {
+        File file = new File(path);
 
         if (file.createNewFile()) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -28,10 +27,6 @@ public class FileHelper {
     }
 
     public static List<Expense> getExpensesFromFile(File file) throws IOException {
-        if (file.length() == 0) {
-            return List.of();
-        }
-
         CsvSchema schema = CsvSchema.builder()
                 .addColumn("id")
                 .addColumn("date")

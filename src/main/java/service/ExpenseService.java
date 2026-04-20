@@ -16,13 +16,13 @@ import java.util.Locale;
 
 @Setter
 @AllArgsConstructor
-public class ExpenseTracerService {
+public class ExpenseService {
     private File file;
 
     public void addExpenseToFile(Expense expense) throws Exception {
         int nextID = addToFile(expense);
 
-        System.out.printf("Expense added successfully (ID: %s)%n", nextID);
+        System.out.printf("Expense has been added successfully (ID: %s)%n", nextID);
     }
 
     private int generateNextId() throws Exception {
@@ -45,7 +45,7 @@ public class ExpenseTracerService {
         System.out.printf("Total expenses: %d%n", sumAmount);
     }
 
-    public void deleteExpense(int id) throws Exception {
+    public void deleteExpense(int id, String path) throws Exception {
         List<Expense> expensesFromFile = FileHelper.getExpensesFromFile(file);
 
         if (isRemoved(id, expensesFromFile)) {
@@ -54,8 +54,11 @@ public class ExpenseTracerService {
             System.out.println("Expense not found");
         }
 
-        file.delete();
-        file = FileHelper.getFile();
+        if (!file.delete()) {
+            throw new IOException("Failed to delete file");
+        }
+
+        file = FileHelper.getFile(path);
 
         for (Expense expense : expensesFromFile) {
             addToFile(expense);
@@ -69,11 +72,15 @@ public class ExpenseTracerService {
             writer.write(String.format("%d,%s,%s,%d\n",
                     nextID,
                     expense.getDate(),
-                    expense.getDescription(),
+                    escape(expense.getDescription()),
                     expense.getAmount()));
         }
 
         return nextID;
+    }
+
+    private String escape(String value) {
+        return value.replace(",", " ");
     }
 
     private boolean isRemoved(int id, List<Expense> expensesFromFile) {
