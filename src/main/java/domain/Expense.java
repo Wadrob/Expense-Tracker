@@ -1,23 +1,21 @@
 package domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
-@Data
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class Expense {
     private int id;
-    private String date;
+    private LocalDate date;
     private String description;
-    private int amount;
+    private BigDecimal amount;
 
-    public Expense(String description, int amount) {
-        this.date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    public Expense(String description, BigDecimal amount) {
+        this.date = LocalDate.now();
         this.description = description;
         this.amount = amount;
     }

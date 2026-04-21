@@ -2,8 +2,11 @@ import helper.FileHelper;
 import service.ExpenseService;
 import tracker.ExpenseTracker;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Application {
-    private final static String EXPENSE_FILE_CSV = "expenseFile.csv";
+    private static final String EXPENSE_FILE_CSV = "expenseFile.csv";
 
     public static void main(String[] args) {
         new Application().start();
@@ -11,16 +14,12 @@ public class Application {
 
     private void start() {
         try {
-            var file = FileHelper.getFile(EXPENSE_FILE_CSV);
-            var expenseTracerService = new ExpenseService(file);
-            var expenseTracker = new ExpenseTracker(expenseTracerService);
+            File file = FileHelper.getFile(EXPENSE_FILE_CSV);
+            ExpenseService expenseService = new ExpenseService(file);
+            ExpenseTracker expenseTracker = new ExpenseTracker(expenseService);
             expenseTracker.run();
-        } catch (Exception e) {
-            handleError(e);
+        } catch (IOException | RuntimeException exception) {
+            exception.printStackTrace();
         }
-    }
-
-    private void handleError(Exception e) {
-        System.err.println("Error: " + e.getMessage());
     }
 }

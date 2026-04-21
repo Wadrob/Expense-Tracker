@@ -3,18 +3,16 @@ package service;
 import domain.Expense;
 import helper.FileHelper;
 import lombok.AllArgsConstructor;
-import lombok.Setter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
-@Setter
 @AllArgsConstructor
 public class ExpenseService {
     private File file;
@@ -37,12 +35,12 @@ public class ExpenseService {
     }
 
     public void summaryAmount() throws IOException {
-        int sumAmount = FileHelper.getExpensesFromFile(file)
+        BigDecimal sumAmount = FileHelper.getExpensesFromFile(file)
                 .stream()
-                .mapToInt(Expense::getAmount)
-                .sum();
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        System.out.printf("Total expenses: %d%n", sumAmount);
+        System.out.printf("Total expenses: %d%n", sumAmount.toBigInteger());
     }
 
     public void deleteExpense(int id, String path) throws Exception {
@@ -88,14 +86,14 @@ public class ExpenseService {
     }
 
     public void handleMonth(int month) throws IOException {
-        int sumMonth = FileHelper.getExpensesFromFile(file)
+        BigDecimal sumMonth = FileHelper.getExpensesFromFile(file)
                 .stream()
-                .filter(expense -> LocalDate.parse(expense.getDate()).getMonthValue() == month)
-                .mapToInt(Expense::getAmount)
-                .sum();
+                .filter(expense -> expense.getDate().getMonthValue() == month)
+                .map(Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         String monthName = Month.of(month).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
-        System.out.printf("Total expenses for %s: %d%n", monthName, sumMonth);
+        System.out.printf("Total expenses for %s: %d%n", monthName, sumMonth.toBigInteger());
     }
 }

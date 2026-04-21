@@ -13,13 +13,14 @@ import java.util.List;
 
 public class FileHelper {
     private static final CsvMapper CSV_MAPPER = new CsvMapper();
+    private static final String HEADERS = "id,date,description,amount\n";
 
     public static File getFile(String path) throws IOException {
         File file = new File(path);
 
         if (file.createNewFile()) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                writer.write("id,date,description,amount\n");
+                writer.write(HEADERS);
             }
         }
 
@@ -35,15 +36,13 @@ public class FileHelper {
                 .setUseHeader(true)
                 .build();
 
-        try {
-            MappingIterator<Expense> iterator =
-                    CSV_MAPPER.readerFor(Expense.class)
-                            .with(schema)
-                            .readValues(file);
-
+        try (MappingIterator<Expense> iterator =
+                     CSV_MAPPER.readerFor(Expense.class)
+                             .with(schema)
+                             .readValues(file)) {
             return iterator.readAll();
         } catch (IOException e) {
-            throw new IOException("Error reading CSV file " + file.getAbsolutePath() + ": " + e.getMessage());
+            throw new IOException("Error reading CSV file " + file.getAbsolutePath() + ": " + e);
         }
     }
 }

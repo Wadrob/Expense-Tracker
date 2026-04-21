@@ -4,6 +4,7 @@ import domain.Expense;
 import service.ExpenseService;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class ExpenseTracker {
@@ -135,14 +136,14 @@ public class ExpenseTracker {
 
         System.out.println("Amount:");
 
-        String amountInput = scanner.nextLine();
+        String amountInput = String.valueOf(scanner.nextBigDecimal());
 
-        int amount;
+        BigDecimal amount;
 
 
         try {
-            amount = Integer.parseInt(amountInput);
-            if (amount <= 0) {
+            amount = new BigDecimal(amountInput);
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("Amount must be positive");
             }
         } catch (NumberFormatException e) {
