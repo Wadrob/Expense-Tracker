@@ -1,12 +1,15 @@
-import helper.FileHelper;
+import cli.ExpenseTrackerCLI;
+import repository.CsvExpenseRepository;
+import repository.ExpenseRepository;
 import service.ExpenseService;
-import tracker.ExpenseTracker;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Application {
-    private static final String EXPENSE_FILE_CSV = "expenseFile.csv";
+
+    Path path = Paths.get("expenseFile.csv");
 
     public static void main(String[] args) {
         new Application().start();
@@ -14,11 +17,11 @@ public class Application {
 
     private void start() {
         try {
-            File file = FileHelper.getFile(EXPENSE_FILE_CSV);
-            ExpenseService expenseService = new ExpenseService(file);
-            ExpenseTracker expenseTracker = new ExpenseTracker(expenseService);
+            ExpenseRepository expenseRepository = new CsvExpenseRepository(path);
+            ExpenseService expenseService = new ExpenseService(expenseRepository);
+            ExpenseTrackerCLI expenseTracker = new ExpenseTrackerCLI(expenseService);
             expenseTracker.run();
-        } catch (IOException | RuntimeException exception) {
+        } catch (RuntimeException | IOException exception) {
             exception.printStackTrace();
         }
     }

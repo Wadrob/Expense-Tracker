@@ -1,64 +1,73 @@
 package service;
 
 import domain.Expense;
-import helper.FileHelper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import repository.ExpenseRepository;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ExpenseServiceTest {
 
-    private File file;
+    @Mock
+    private ExpenseRepository repository;
+
+    @InjectMocks
     private ExpenseService service;
 
-    @BeforeEach
-    void setup() throws Exception {
-        file = File.createTempFile("test", ".csv");
+    @Test
+    void shouldCalculateTotalAmount() {
+        when(repository.findAll()).thenReturn(List.of(
+                new Expense("a", BigDecimal.valueOf(10), "2026-05-01"),
+                new Expense("b", BigDecimal.valueOf(20), "2026-05-02")
+        ));
 
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write("id,date,description,amount\n");
-        }
+        BigDecimal result = service.getTotalAmount();
 
-        service = new ExpenseService(file);
-    }
-
-    @AfterEach
-    void cleanup() {
-        file.delete();
+        assertEquals(BigDecimal.valueOf(30), result);
     }
 
     @Test
-    void shouldAddExpense() throws Exception {
-        Expense expense = new Expense("Coffee", 10);
+    void shouldCalculateMonthlyTotal() {
+        when(repository.findAll()).thenReturn(List.of(
+                new Expense("a", BigDecimal.valueOf(10), "2026-05-01"),
+                new Expense("b", BigDecimal.valueOf(20), "2026-04-01")
+        ));
 
-        service.addExpenseToFile(expense);
+        BigDecimal result = service.getMonthlyTotal(5);
 
-        List<Expense> expenses = FileHelper.getExpensesFromFile(file);
-
-        assertEquals(1, expenses.size());
-        assertEquals("Coffee", expenses.get(0).getDescription());
+        assertEquals(BigDecimal.valueOf(10), result);
     }
 
     @Test
-    void shouldDeleteExpense() throws Exception {
-        Expense e1 = new Expense("A", 10);
-        e1.setId(1);
+    void shouldCallRepositoryDelete() {
+        service.deleteExpense(5);
 
-        Expense e2 = new Expense("B", 20);
-        e2.setId(2);
+        verify(repository, times(1)).delete(5);
+    }
 
-        service.addExpenseToFile(e1);
-        service.addExpenseToFile(e2);
+    @Test
+    void shouldSaveExpense() {
+        service.addExpense("test", BigDecimal.valueOf(100));
 
-        service.deleteExpense(1, file.getPath());
+        ArgumentCaptor<Expense> captor = ArgumentCaptor.forClass(Expense.class);
 
-        List<Expense> expenses = FileHelper.getExpensesFromFile(file);
+        verify(repository).save(captor.capture());
 
-        assertEquals(1, expenses.size());
-        assertEquals(1, expenses.get(0).getId());
+        Expense saved = captor.getValue();
+
+        assertEquals("test", saved.getDescription());
+        assertEquals(BigDecimal.valueOf(100), saved.getAmount());
+        assertNotNull(saved.getDate());
     }
 }
