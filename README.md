@@ -1,26 +1,54 @@
-# Expense Tracker
+# Expense Tracker (Java CLI)
 
-Simple CLI application to manage daily expenses using a CSV file.
+A simple command-line application for tracking personal expenses.  
+Built in Java with CSV-based persistence.
 
-## Features
+# Features
 
-- Add expense
-- Delete expense
-- List expenses
-- Calculate total amount
-- Filter by month
+- Add expenses (description, amount, auto-generated date)
+- List all expenses
+- Delete expense by ID
+- Total expenses summary
+- Monthly expense summary
+- Persistent storage using CSV file
 
-## Tech Stack
+# Project Structure
 
-- Java 17
-- Maven
-- Jackson CSV
+cli/ → Command-line interface
+service/ → Business logic
+repository/ → CSV persistence layer
+domain/ → Expense model
+helper/ → File utilities
+Application → Entry point
 
-## Example
+# Commands
 
-add
-Coffee
-10
+Command	Description:
+add	- Add new expense
+list - Show all expenses
+delete -	Remove expense by ID
+summary -	Show total expenses
+summary month -	Show monthly summary
+info -	Show available commands
+quit -	Exit application
 
-list
-ID: 1 | DATE: 2026-04-17 | DESCRIPTION: Coffee | AMOUNT: 10
+# CSV format
+
+id,date,description,amount
+1,2026-05-06,food,25.50
+2,2026-05-06,transport,10.00
+
+# Tech stack
+Java 17+
+Stream API
+BigDecimal
+Jackson CSV
+JUnit 5
+Mockito
+
+Clean architecture
+File-based persistence
+Unit testing (JUnit + Mockito)
+Java Stream API
+
+Done as training for https://roadmap.sh/projects/github-user-activity
