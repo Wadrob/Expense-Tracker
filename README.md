@@ -51,4 +51,4 @@ File-based persistence
 Unit testing (JUnit + Mockito)
 Java Stream API
 
-Done as training for https://roadmap.sh/projects/expense-tracker
+Done as training for [https://roadmap.sh/projects/expense-tracker](https://roadmap.sh/projects/expense-tracker)
